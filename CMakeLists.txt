@@ -12,8 +12,8 @@ add_executable(PrimeBreaker
       	utils/chronoGPU.cu
 	utils/chronoCPU.cpp
 	helper.cpp
-	primeBreakerCPU.cpp
-	primeBreaker.cu
+	primeCPU.cpp
+	primeGPGPU.cu
 	main.cu
 	)
 

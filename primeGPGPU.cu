@@ -1,4 +1,4 @@
-#include "primeBreaker.hpp"
+#include "primeGPGPU.hpp"
 
 
 /**	\brief Je suis une fonction d'évaluation de la primalité d'un nombre premier.
@@ -19,7 +19,7 @@ void isPrime(
 
 	cache[tid] = 1;
 	while (gid < sqrtN){
-		cache[tid] = (N%possibles_premiers[gid] != 0); // Si il n'y a pas de reste (le nombre est divisé entièrement par un autre nombre) j'inscrit zero dans le cache 
+		cache[tid] = (N%possibles_premiers[gid] != 0); // Si il n'y a pas de reste (le nombre est divisé entièrement par un autre nombre) j'inscrit zero dans le cache
 
 		__syncthreads();
 
@@ -31,15 +31,15 @@ void isPrime(
 			__syncthreads();
 			offset /= 2;
 		}
-		
+
 		if (tid == 0) {
-			res_operations[bid] = cache[0]; 
+			res_operations[bid] = cache[0];
 		}
-		
-		gid += gridDim.x * blockDim.x;	
+
+		gid += gridDim.x * blockDim.x;
 	}
 
-	
+
 	if (initial_gid < ((sqrtN+blockDim.x-1)/blockDim.x))
 		res_operations[0] = ((res_operations[0] != 0) && (res_operations[initial_gid] != 0));
 
@@ -47,7 +47,7 @@ void isPrime(
 
 /*	/brief	Je suis une fonction qui récupère les nombres premiers inférieur à une borne renseignée
 		à paramètre.
-  
+
  */
 __global__ void searchPrimeGPU(
 		uint64_t *possibles_premiers,
@@ -69,20 +69,20 @@ __global__ void searchPrimeGPU(
 			 	square_roots[gid]
 			 	);
 			cudaDeviceSynchronize();
-		
-			premiers[gid] = res_operations[0];	
+
+			premiers[gid] = res_operations[0];
 			free(res_operations);
 		}
 		gid += gridDim.x * blockDim.x;
 	}
-	
+
 }
 
 
 /** \brief
     je suis la fonction qui permet de decomposeur un numero en facteurs premiers
 */
-__global__ 
+__global__
 void factGPU(
 		uint64_t  N,
 		uint64_t *dev_primes,
@@ -100,19 +100,19 @@ void factGPU(
 		uint64_t temp_N = N;
 
 		while(temp_N%dev_primes[gid]==0)
-                {             
+                {
 			cache[tid] += 1;
 			temp_N /= dev_primes[gid];
 		}
-		
+
 		__syncthreads();
-		
+
 		if (tid == 0){
 			for (int i = 0; i < blockDim.x; i++){
 				if (cache[i]) {
 					dev_facteurs[i+blockIdx.x*blockDim.x].expo += cache[i];
 					N -= (dev_facteurs[i+blockIdx.x*blockDim.x].base * cache[i]);
-				}		
+				}
 			}
 		}
 		__syncthreads();

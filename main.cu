@@ -3,13 +3,11 @@
 #include <cstdint>
 #include "utils/chronoGPU.hpp"
 #include "utils/chronoCPU.hpp"
-#include "primeBreaker.hpp"
-#include "primeBreakerCPU.hpp"
-#include "TestPrimeBreakerGPU.hpp"
-#include "TestPrimeBreaker.hpp"
+#include "primeGPGPU.hpp"
+#include "primeCPU.hpp"
 #include "utils/common.hpp"
 #include "helper.hpp"
-#include "benchmark.h"
+
 
 using namespace std;
 

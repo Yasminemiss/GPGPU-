@@ -1,4 +1,4 @@
-#include "primeBreakerCPU.hpp"
+#include "primeCPU.hpp"
 #include <bits/stdc++.h>
 
 using namespace std;
