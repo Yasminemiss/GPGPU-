@@ -6,22 +6,21 @@
 #include <iostream>
 #include <cstdlib>
 #include <cstdint>
-#include "utils/common.hpp"
-#include "utils/chronoCPU.hpp"
-#include "utils/chronoGPU.hpp"
+#include "common.hpp"
+#include "chronoCPU.hpp"
+#include "chronoGPU.hpp"
 #include <bits/stdc++.h>
 #include "helper.hpp"
 
 using namespace std;
 
-/** /brief Je suis une fonction qui évalue partiellement la primalité d'un nombre, un traitement
- * final doit être effectué par la fonction appelante afin d'évaluer la primalitée.
-*/
 __global__
-void isPrime(	uint64_t *possibles_premiers,
-		unsigned int *res_operations,
+void isPrimeGPU(uint64_t N_square,
 		uint64_t  N,
-		uint64_t sqrtN);
+			uint64_t *p,
+		unsigned int *r,
+
+		);
 
 __global__
 void searchPrimeGPU(
@@ -34,6 +33,6 @@ __global__ void factGPU(
 		uint64_t  N,
 		uint64_t *dev_primes,
                 int taille,
-		cell *dev_facteurs
+		primes *dev_facteurs
 		);
 #endif

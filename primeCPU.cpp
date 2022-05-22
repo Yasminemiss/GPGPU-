@@ -6,7 +6,7 @@ using namespace std;
 
 bool isPrimeCPU(const uint64_t number)
 {
-    double i = number-1
+    double i = number-1;
     while(i >= 2)
     {
         if (floor(number/i) == number/i) return false;
@@ -43,7 +43,7 @@ std::vector<uint64_t> searchPrimesCPU(const uint64_t l){
                  p[0]=listes_numbers.at(pivot);
                  p[1]=1;
                  N=N/listes_numbers.at(pivot);
-                 addCell(c,facteursPrimes);
+                 updatePrimes(p,facteursPrimes);
                 }
                else if( pivot < listes_numbers.size()) pivot++;
 

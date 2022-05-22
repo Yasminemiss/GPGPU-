@@ -1,54 +1,51 @@
 #include "primeGPGPU.hpp"
 
 
-/**	\brief Je suis une fonction d'évaluation de la primalité d'un nombre premier.
-  */
 __global__
-void isPrime(
-		uint64_t *possibles_premiers,
-		unsigned int *res_operations,
-		uint64_t N,
-		uint64_t sqrtN
+void isPrimeGPU(
+	uint64_t N_square,
+	uint64_t N,
+		uint64_t *p,
+		unsigned int *r
 		){
 
 	int gid = threadIdx.x + blockIdx.x * blockDim.x;
 	int initial_gid = gid;
-	int bid = blockIdx.x;
 	int tid = threadIdx.x;
 	extern __shared__ unsigned int cache[];
 
 	cache[tid] = 1;
-	while (gid < sqrtN){
-		cache[tid] = (N%possibles_premiers[gid] != 0); // Si il n'y a pas de reste (le nombre est divisé entièrement par un autre nombre) j'inscrit zero dans le cache
+	while (gid < N_square){
+		cache[tid] = (N%p[gid] != 0);
 
 		__syncthreads();
 
 		int offset = blockDim.x/2;
 		while (offset != 0) {
 			if (tid < offset) {
-				cache[tid] = umin ( cache[tid], cache[tid+offset] );
+				cache[tid] = umin( cache[tid], cache[tid+offset] );
 			}
 			__syncthreads();
 			offset /= 2;
 		}
 
 		if (tid == 0) {
-			res_operations[bid] = cache[0];
+			r[blockIdx.x] = cache[0];
 		}
 
 		gid += gridDim.x * blockDim.x;
 	}
 
 
-	if (initial_gid < ((sqrtN+blockDim.x-1)/blockDim.x))
-		res_operations[0] = ((res_operations[0] != 0) && (res_operations[initial_gid] != 0));
+	if (initial_gid < ((N_square+blockDim.x-1)/blockDim.x))
+	{
+			r[0] = ((r[0] != 0) && (r[initial_gid] != 0));
+	}
+
 
 }
 
-/*	/brief	Je suis une fonction qui récupère les nombres premiers inférieur à une borne renseignée
-		à paramètre.
 
- */
 __global__ void searchPrimeGPU(
 		uint64_t *possibles_premiers,
 		uint64_t *square_roots,
@@ -78,22 +75,17 @@ __global__ void searchPrimeGPU(
 
 }
 
-
-/** \brief
-    je suis la fonction qui permet de decomposeur un numero en facteurs premiers
-*/
 __global__
 void factGPU(
 		uint64_t  N,
 		uint64_t *dev_primes,
                	int taille,
-		cell *dev_facteurs
+		primes *dev_facteurs
 )
 {
 	int gid = threadIdx.x+blockIdx.x*blockDim.x;
 	int tid = threadIdx.x;
-        extern __shared__ unsigned int cache[];
-
+  extern __shared__ unsigned int cache[];
 	while(gid < taille)
        	{
         	cache[tid] = 0;
@@ -104,19 +96,16 @@ void factGPU(
 			cache[tid] += 1;
 			temp_N /= dev_primes[gid];
 		}
-
 		__syncthreads();
-
 		if (tid == 0){
 			for (int i = 0; i < blockDim.x; i++){
 				if (cache[i]) {
-					dev_facteurs[i+blockIdx.x*blockDim.x].expo += cache[i];
-					N -= (dev_facteurs[i+blockIdx.x*blockDim.x].base * cache[i]);
+					dev_facteurs[i+blockIdx.x*blockDim.x][1] += cache[i];
+					N -= (dev_facteurs[i+blockIdx.x*blockDim.x][0] * cache[i]);
 				}
 			}
 		}
 		__syncthreads();
-
             gid+=blockDim.x*gridDim.x;
         }
 }

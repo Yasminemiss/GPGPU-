@@ -8,7 +8,7 @@ using namespace std;
 string afficherPrimes(vector<uint64_t> primeNumbers)
 {
     string r = " \n " ;
-    int i =0
+    int i =0;
     while(i < primeNumbers.size()) {
       r += std::to_string(primeNumbers.at(i));
       i++;
@@ -29,7 +29,7 @@ string afficherFacteurs(vector<primes> facteurs )
           res+=val;
         }
         else{
-          res+val+"*"
+          res+=val+"*";
         }
          i++;
     }
@@ -52,5 +52,5 @@ void updatePrimes( primes c , vector< primes> *facteursPrimes)
        i++;
     }
 
-    if(upatePrimes==true) facteursPrimes->push_back(c);
+  //  if(upatePrimes==true) facteursPrimes->push_back(c);
 }

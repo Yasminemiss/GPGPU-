@@ -13,7 +13,7 @@ using namespace std;
 
 bool isPrimeCPU(const uint64_t number);
 std::vector<uint64_t> searchPrimesCPU(const uint64_t l);
-void factoCPU(uint64_t N, vector<cell> *facteursPrimes);
+void factoCPU(uint64_t N, vector<primes> *facteursPrimes);
 
 
 

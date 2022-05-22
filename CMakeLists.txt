@@ -3,14 +3,13 @@ cmake_minimum_required(VERSION 3.10)
 project(ProjetGPU LANGUAGES CUDA CXX)
 
 set(CMAKE_CUDA_STANDARD 14)
-set(gnuplot-cpp_DIR gnuplot-cpp)
 find_package(gnuplot-cpp REQUIRED)
 
 include_directories(${gnuplot-cpp_INCLUDE_DIRS})
 
 add_executable(PrimeBreaker
-      	utils/chronoGPU.cu
-	utils/chronoCPU.cpp
+      	chronoGPU.cu
+	chronoCPU.cpp
 	helper.cpp
 	primeCPU.cpp
 	primeGPGPU.cu
