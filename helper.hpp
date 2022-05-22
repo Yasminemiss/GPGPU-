@@ -1,37 +1,21 @@
-/** \brief  Je suis un fichier header contenant des constantes et déclarations d'usage
- *          général utiles à plusieurs parties du logiciel.
- */
-#ifndef PROJETGPU_HELPER_H
-#define PROJETGPU_HELPER_H
+#ifndef HELPER_H
+#define HELPER_H
 
-/**
- * \brief Booléens de génération de log pour le débug.
- */
-#define VERBOSE 0
-#define INFO    0
-
-/** \brief Inclusions et prototypes liés aux fonctions et structures à usage général.
- *
- */
-#include <vector> // vector<T>
-#include <cstdint> // uint64_t
-#include <string> // string
-#include <iostream> // cerr, cout, endl
+#include <vector>
+#include <cstdint>
+#include <string>
+#include <iostream>
 
 using namespace std;
 
-/**  \brief Je suis un tuple contenant le facteur premier et son exponentiation.
- */
-struct cell {
-    uint64_t base;
-    int expo;
-};
-
-void printUsage( const char *prg );
-string printPrimes(vector<uint64_t> primeNumbers);
-string printFacteurs(vector<cell> facteurs);
-void addCell( cell c , vector< cell> *facteursPrimes);
-void mAssert(char *const expr_str, bool expr, basic_string<char> msg);
+typedef uint64_t longInteger;
+typedef longInteger primes[2]; // tableau où la premier valeur est la base et le deuxieme et l'exposant
 
 
-#endif //PROJETGPU_HELPER_H
+string afficherPrimes(vector<uint64_t> primeNumbers);
+string afficherFacteurs(vector<primes> facteurs );
+void updatePrimes( primes c , vector< primes> *facteursPrimes);
+
+
+
+#endif

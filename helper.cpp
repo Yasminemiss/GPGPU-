@@ -2,70 +2,55 @@
 
 
 using namespace std;
-// TODO : Commenter
-void printUsage( const char *prg )
+
+
+
+string afficherPrimes(vector<uint64_t> primeNumbers)
 {
-    cerr	<< "Usage: " << prg << "  N "
-            << endl << endl;
-    exit( EXIT_FAILURE );
+    string r = " \n " ;
+    int i =0
+    while(i < primeNumbers.size()) {
+      r += std::to_string(primeNumbers.at(i));
+      i++;
+    }
+
+    return r;
 }
 
-// TODO : Commenter
-string printPrimes(vector<uint64_t> primeNumbers)
-{
-    string res =  "Nombres premiers : \n " ;
 
-    for(int i =0 ; i < primeNumbers.size() ; i++)
+string afficherFacteurs(vector<primes> facteurs )
+{
+    string res =" \n";
+    int i = 0 ;
+    while( i < facteurs.size())
     {
-        res += "[" + std::to_string(primeNumbers.at(i)) + "]";
+        string val = to_string(facteurs.at(i)[0])+"^"+to_string(facteurs.at(i)[1]);
+        if(i==facteurs.size()-1){
+          res+=val;
+        }
+        else{
+          res+val+"*"
+        }
+         i++;
     }
     return res;
 }
 
-// TODO : Commenter
-string printFacteurs(vector<cell> facteurs )
-{
-    string res = "Les Facteurs premiers :  \n ";
-    for(int i = 0 ; i < facteurs.size(); i++)
-    {
-        string cell = to_string(facteurs.at(i).base)+"^"+to_string(facteurs.at(i).expo);
-        res+= (i==facteurs.size()-1) ? ""+cell : cell+"*" ;
-    }
-    return res;
-}
 
-// TODO : commenter
-
-
-/**   \brief je suis la methode qui va ajouter , une celule dans le vecteurs de facteurs
-*/
-
-void addCell( cell c , vector< cell> *facteursPrimes)
+void updatePrimes( primes c , vector< primes> *facteursPrimes)
 {
 
-    bool add=true;
-    for(int i=0 ; i < facteursPrimes->size();i++)
+    bool upatePrimes=true;
+    int i=0 ;
+    while( i < facteursPrimes->size())
     {
-       if(c.base==facteursPrimes->at(i).base)
+       if(c[0]==facteursPrimes->at(i)[0])
        {
-         facteursPrimes->at(i).expo+=1;
-         add=false;
+         facteursPrimes->at(i)[1]+=1;
+         upatePrimes=false;
        }
+       i++;
     }
 
-    if(add==true) facteursPrimes->push_back(c);
+    if(upatePrimes==true) facteursPrimes->push_back(c);
 }
-
-/** \brief Je suis une fonction pour effectuer un meilleur affichage en cas
- *          d'échec d'une assertion.
- */
- void mAssert(char *const expr_str, bool expr, basic_string<char> msg){
-    if (!expr){
-        std::cout << "Echec de l'assertion: " << msg << endl
-        << "Resultat Attendu : " << expr_str << endl
-        << "a renvoyé : False." << endl;
-
-        std::cout << "Echec du test, fin du programme." << endl;
-        exit(1);
-    }
- }
