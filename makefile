@@ -8,3 +8,6 @@ helper.o : helper.cpp helper.hpp
 	g++ -c helper.cpp- L/usr/local/cuda/lib64 -lcudart
 chronoCPU.o : chronoCPU.cpp
 	g++ -c chronoCPU.cpp -L/usr/local/cuda/lib64 -lcudart
+
+
+#g++ -o primeCPU primeCPU.cpp
