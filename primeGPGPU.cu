@@ -80,7 +80,7 @@ void factGPU(
 		uint64_t  N,
 		uint64_t *dev_primes,
                	int taille,
-		primes *dev_facteurs
+		uint64_t *dev_facteurs
 )
 {
 	int gid = threadIdx.x+blockIdx.x*blockDim.x;
