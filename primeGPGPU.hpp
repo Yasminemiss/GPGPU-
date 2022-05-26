@@ -7,10 +7,7 @@
 #include <cstdlib>
 #include <cstdint>
 #include "common.hpp"
-#include "chronoCPU.hpp"
-#include "chronoGPU.hpp"
 #include <bits/stdc++.h>
-#include "helper.hpp"
 
 using namespace std;
 
@@ -19,7 +16,6 @@ void isPrimeGPU(uint64_t N_square,
 		uint64_t  N,
 			uint64_t *p,
 		unsigned int *r,
-
 		);
 
 __global__
