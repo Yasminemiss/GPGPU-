@@ -1,0 +1,12 @@
+# pour compiler la version en cpu
+g++ -o primeCPU primeCPU.cpp
+# pour lancer le code
+./primeCPU
+
+# pour compiler la version GPGPU
+nvcc -o main main.cu primeGPGPU.cu
+# pour lancer
+./main
+
+au cas où pour installer le compilateur nvcc sur ubuntu
+https://linuxconfig.org/how-to-install-cuda-on-ubuntu-20-04-focal-fossa-linux
