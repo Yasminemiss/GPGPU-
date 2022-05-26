@@ -11,12 +11,16 @@
 
 using namespace std;
 
+struct fact {
+    uint64_t base;
+    int expo;
+};
+
 __global__
-void isPrimeGPU(uint64_t N_square,
+void isPrime(	uint64_t *possibles_premiers,
+		unsigned int *res_operations,
 		uint64_t  N,
-			uint64_t *p,
-		unsigned int *r,
-		);
+		uint64_t sqrtN);
 
 __global__
 void searchPrimeGPU(
@@ -29,6 +33,6 @@ __global__ void factGPU(
 		uint64_t  N,
 		uint64_t *dev_primes,
                 int taille,
-		uint64_t *dev_facteurs
+		fact *dev_facteurs
 		);
 #endif

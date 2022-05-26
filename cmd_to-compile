@@ -4,7 +4,8 @@ g++ -o primeCPU primeCPU.cpp
 ./primeCPU
 
 # pour compiler la version GPGPU
-nvcc -o main main.cu primeGPGPU.cu
+nvcc -arch=compute_35 -o main main.cu primeGPGPU.cu
+
 # pour lancer
 ./main
 
