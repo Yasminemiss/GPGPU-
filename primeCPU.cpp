@@ -15,10 +15,6 @@ using namespace std::chrono;
 
 
 
-
-
-
-
 void updatePrimes( uint64_t* ptr , vector<uint64_t*> *facteursPrimes)
 {
 
@@ -46,6 +42,9 @@ void updatePrimes( uint64_t* ptr , vector<uint64_t*> *facteursPrimes)
 
 }
 
+/**
+  c'est la fonction qui permet de tester un nombre s'il est premier ou pas
+**/
 bool isPrimeCPU(const uint64_t number)
 {
     double i = number-1;
@@ -96,10 +95,11 @@ vector<uint64_t> searchPrimesCPU(const uint64_t l){
 int main( int argc, char **argv )
 {
 
-  uint64_t N=30;
+  uint64_t N=atol(argv[1]);
   int i;
   cout << " fonction isPrime  N "<<N<<" est prime ? " <<isPrimeCPU(N) <<'\n';
   auto start = high_resolution_clock::now();
+
   vector<uint64_t> v = searchPrimesCPU(N);
   cout << " fonction search prime " << '\n';
   i =0;
