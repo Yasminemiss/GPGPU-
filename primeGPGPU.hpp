@@ -17,17 +17,12 @@ struct fact {
 };
 
 __global__
-void isPrime(	uint64_t *possibles_premiers,
+void isPrimeGPU(	uint64_t *possibles_premiers,
 		unsigned int *res_operations,
 		uint64_t  N,
 		uint64_t sqrtN);
 
-__global__
-void searchPrimeGPU(
-		uint64_t *possibles_premiers,
-		uint64_t *square_roots,
-		uint64_t borne_sup,
-		uint64_t *premiers);
+
 
 __global__ void factGPU(
 		uint64_t  N,
@@ -35,4 +30,11 @@ __global__ void factGPU(
                 int taille,
 		fact *dev_facteurs
 		);
+
+__global__
+void searchPrimeGPU(
+		uint64_t *possibles_premiers,
+		uint64_t *square_roots,
+		uint64_t borne_sup,
+		uint64_t *premiers);
 #endif

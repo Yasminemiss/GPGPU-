@@ -1,7 +1,7 @@
 #include "primeGPGPU.hpp"
 
 __global__
-void isPrime(
+void isPrimeGPU(
 		uint64_t *possibles_premiers,
 		unsigned int *res_operations,
 		uint64_t N,

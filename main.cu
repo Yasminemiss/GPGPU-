@@ -23,7 +23,7 @@ uint64_t TailleGrid(uint64_t X){
 }
 
 
-void isPrime(uint64_t N){
+void Lancer_isPrime(uint64_t N){
 		uint64_t sqrtN = sqrt(N) + 1;
 		uint64_t nombresDePossiblesPremiers = N-2;
 
@@ -52,7 +52,7 @@ void isPrime(uint64_t N){
 		free(res_operations);
 }
 
-vector<uint64_t> searchPrimes(uint64_t N){
+vector<uint64_t> Lancer_searchPrimes(uint64_t N){
 
 
 
@@ -102,9 +102,9 @@ vector<uint64_t> searchPrimes(uint64_t N){
 		return premiers_packed;
 }
 
-void facteurs(uint64_t N){
+void Lancer_facteurs(uint64_t N){
 
-  	vector<uint64_t> premiers_packed = searchPrimes(N);
+  	vector<uint64_t> premiers_packed = Lancer_searchPrimes(N);
 		int taille = premiers_packed.size();
 		uint64_t *primes = (uint64_t*)malloc(sizeof(uint64_t) * taille);
 		for(int i = 0; i < taille; primes[i]=premiers_packed.at(i),i++);
@@ -125,7 +125,7 @@ void facteurs(uint64_t N){
 		cudaMemcpy(dev_facteurs,facteurs,sizeof(fact)*taille,cudaMemcpyHostToDevice);
 
 
-	  factGPU<<<GRID(taille),BLOCKDIM>>>(
+	  factGPU<<<TailleGrid(taille),BLOCKDIM>>>(
 				N,
 				dev_primes,
 				taille,
@@ -153,9 +153,9 @@ int main( int argc, char **argv ){
   uint64_t N =atol(argv[1]);
   auto start = high_resolution_clock::now();
 
-  isPrime(N);
-  vector<uint64_t> v=searchPrimes(N);
-  facteurs(N);
+  Lancer_isPrime(N);
+  vector<uint64_t> v=Lancer_searchPrimes(N);
+  Lancer_facteurs(N);
   auto stop = high_resolution_clock::now();
   auto duration = duration_cast<microseconds>(stop - start);
  cout << "Time taken by GPU version : "
