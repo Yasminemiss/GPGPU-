@@ -41,7 +41,7 @@ void Lancer_isPrime(uint64_t N){
 
 		cudaMemcpy(dev_possibles_premiers, possibles_premiers, sizeof(uint64_t) * (nombresDePossiblesPremiers), cudaMemcpyHostToDevice);
 	       	cudaMemcpy(dev_res_operations, res_operations, sizeof(unsigned int) * TailleGrid(sqrtN), cudaMemcpyHostToDevice);
-		isPrime<<<TailleGrid(sqrtN),BLOCKDIM,SIZEMEM>>>(dev_possibles_premiers, dev_res_operations, N, sqrtN);
+		isPrimeGPU<<<TailleGrid(sqrtN),BLOCKDIM,SIZEMEM>>>(dev_possibles_premiers, dev_res_operations, N, sqrtN);
 		cudaMemcpy(res_operations, dev_res_operations, sizeof(unsigned int) * TailleGrid(sqrtN), cudaMemcpyDeviceToHost);
 
 

@@ -73,7 +73,7 @@ __global__ void searchPrimeGPU(
 		uint64_t borne_sup,
 		uint64_t *premiers)
 {
-	int gid = threadIdx.x + blockIdx.x * blockDim.x;
+	/*int gid = threadIdx.x + blockIdx.x * blockDim.x;
 	while (gid < borne_sup-2) {
 		if (gid == 0) {
 			premiers[gid] = 1;
@@ -93,7 +93,7 @@ __global__ void searchPrimeGPU(
 			free(resultat);
 		}
 		gid += gridDim.x * blockDim.x;
-	}
+	}*/
 
 }
 
