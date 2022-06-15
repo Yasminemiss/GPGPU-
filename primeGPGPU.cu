@@ -1,9 +1,20 @@
 #include "primeGPGPU.hpp"
 
+
+__device__ void warpReduce(volatile unsigned int* cache, int t_id)
+{
+	cache[t_id]=umin( cache[t_id], cache[t_id + 32] );
+	cache[t_id]=umin( cache[t_id], cache[t_id + 16] );
+	cache[t_id]=umin( cache[t_id], cache[t_id + 8] );
+	cache[t_id]=umin( cache[t_id], cache[t_id + 4] );
+	cache[t_id]=umin( cache[t_id], cache[t_id + 2] );
+	cache[t_id]=umin( cache[t_id], cache[t_id + 1] );
+}
+
 __global__
 void isPrimeGPU(
-		uint64_t *possibles_premiers,
-		unsigned int *res_operations,
+		uint64_t *Prime_PossiblE,
+		unsigned int *resultat,
 		uint64_t N,
 		uint64_t sqrtN
 		){
@@ -12,39 +23,52 @@ void isPrimeGPU(
 	int initial_gid = gid;
 	int bid = blockIdx.x;
 	int tid = threadIdx.x;
-	extern __shared__ unsigned int cache[];
 
-	cache[tid] = 1;
+
+	extern __shared__ unsigned int Shared_memory[tid]=1;
+
+	//Shared_memory[tid] = 1;
 	while (gid < sqrtN){
-		cache[tid] = (N%possibles_premiers[gid] != 0);
+
+		if(N%Prime_PossiblE[gid] !=0){
+				Shared_memory[tid] = 1;
+		}else{
+				Shared_memory[tid] = 0;
+		}
 
 		__syncthreads();
 
-		int offset = blockDim.x/2;
-		while (offset != 0) {
-			if (tid < offset) {
-				cache[tid] = umin ( cache[tid], cache[tid+offset] );
+
+
+		int i = blockDim.x/2;
+		while (i >32) {
+
+			if (tid < i) {
+				Shared_memory[tid] = umin ( Shared_memory[tid], Shared_memory[tid+i] );
 			}
 			__syncthreads();
-			offset /= 2;
+			i /= 2;
 		}
 
+    if(t_id < 32) warpReduce(Shared_memory,t_id);
+
 		if (tid == 0) {
-			res_operations[bid] = cache[0];
+			resultat[bid] = Shared_memory[0];
 		}
 
 		gid += gridDim.x * blockDim.x;
+
 	}
 
 
 	if (initial_gid < ((sqrtN+blockDim.x-1)/blockDim.x))
-		res_operations[0] = ((res_operations[0] != 0) && (res_operations[initial_gid] != 0));
+		resultat[0] = ((resultat[0] != 0) && (resultat[initial_gid] != 0));
 
 }
 
 
 __global__ void searchPrimeGPU(
-		uint64_t *possibles_premiers,
+		uint64_t *Prime_PossiblE,
 		uint64_t *square_roots,
 		uint64_t borne_sup,
 		uint64_t *premiers)
@@ -54,18 +78,19 @@ __global__ void searchPrimeGPU(
 		if (gid == 0) {
 			premiers[gid] = 1;
 		} else {
-			int res_operations_size = ((square_roots[gid]+blockDim.x-1)/blockDim.x)+1;
-			unsigned int *res_operations = (unsigned int*)malloc(sizeof(unsigned int)*res_operations_size);
-			isPrime<<<gridDim.x,blockDim.x,blockDim.x*sizeof(unsigned int)>>>
-				(possibles_premiers,
-			 	res_operations,
-			 	possibles_premiers[gid],
+			int resultat_size = ((square_roots[gid]+blockDim.x-1)/blockDim.x)+1;
+			unsigned int *resultat = (unsigned int*)malloc(sizeof(unsigned int)*resultat_size);
+
+			isPrimeGPU<<<gridDim.x,blockDim.x,blockDim.x*sizeof(unsigned int)>>>
+				(Prime_PossiblE,
+			 	resultat,
+			 	Prime_PossiblE[gid],
 			 	square_roots[gid]
 			 	);
 			cudaDeviceSynchronize();
 
-			premiers[gid] = res_operations[0];
-			free(res_operations);
+			premiers[gid] = resultat[0];
+			free(resultat);
 		}
 		gid += gridDim.x * blockDim.x;
 	}
@@ -83,16 +108,16 @@ void factGPU(
 {
 	int gid = threadIdx.x+blockIdx.x*blockDim.x;
 	int tid = threadIdx.x;
-        extern __shared__ unsigned int cache[];
+        extern __shared__ unsigned int Shared_memory[];
 
 	while(gid < taille)
        	{
-        	cache[tid] = 0;
+        	Shared_memory[tid] = 0;
 		uint64_t temp_N = N;
 
 		while(temp_N%dev_primes[gid]==0)
                 {
-			cache[tid] += 1;
+			Shared_memory[tid] += 1;
 			temp_N /= dev_primes[gid];
 		}
 
@@ -100,9 +125,9 @@ void factGPU(
 
 		if (tid == 0){
 			for (int i = 0; i < blockDim.x; i++){
-				if (cache[i]) {
-					dev_facteurs[i+blockIdx.x*blockDim.x].expo += cache[i];
-					N -= (dev_facteurs[i+blockIdx.x*blockDim.x].base * cache[i]);
+				if (Shared_memory[i]) {
+					dev_facteurs[i+blockIdx.x*blockDim.x].expo += Shared_memory[i];
+					N -= (dev_facteurs[i+blockIdx.x*blockDim.x].base * Shared_memory[i]);
 				}
 			}
 		}
