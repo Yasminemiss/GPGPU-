@@ -1,14 +1,14 @@
 #include "primeGPGPU.hpp"
 
 
-__device__ void warpReduce(volatile unsigned int* cache, int t_id)
+__device__ void warpReduce(volatile unsigned int* cache, int tid)
 {
-	cache[t_id]=umin( cache[t_id], cache[t_id + 32] );
-	cache[t_id]=umin( cache[t_id], cache[t_id + 16] );
-	cache[t_id]=umin( cache[t_id], cache[t_id + 8] );
-	cache[t_id]=umin( cache[t_id], cache[t_id + 4] );
-	cache[t_id]=umin( cache[t_id], cache[t_id + 2] );
-	cache[t_id]=umin( cache[t_id], cache[t_id + 1] );
+	cache[tid]=umin( cache[tid], cache[tid + 32] );
+	cache[tid]=umin( cache[tid], cache[tid + 16] );
+	cache[tid]=umin( cache[tid], cache[tid + 8] );
+	cache[tid]=umin( cache[tid], cache[tid + 4] );
+	cache[tid]=umin( cache[tid], cache[tid + 2] );
+	cache[tid]=umin( cache[tid], cache[tid + 1] );
 }
 
 __global__
@@ -50,7 +50,7 @@ void isPrimeGPU(
 			i /= 2;
 		}
 
-    if(t_id < 32) warpReduce(Shared_memory,t_id);
+    if(tid < 32) warpReduce(Shared_memory,tid);
 
 		if (tid == 0) {
 			resultat[bid] = Shared_memory[0];
