@@ -15,10 +15,13 @@
 using namespace std;
 using namespace std::chrono;
 
-
-#define GRID(X) ((X+BLOCKDIM-1)/BLOCKDIM)
-#define SIZEMEM (BLOCKDIM * sizeof(unsigned int))
 #define BLOCKDIM 256
+#define SIZEMEM (BLOCKDIM * sizeof(unsigned int))
+
+uint64_t TailleGrid(uint64_t X){
+	return ((X+BLOCKDIM-1)/BLOCKDIM);
+}
+
 
 void isPrime(uint64_t N){
 		uint64_t sqrtN = sqrt(N) + 1;
@@ -26,20 +29,20 @@ void isPrime(uint64_t N){
 
 		uint64_t *possibles_premiers = (uint64_t*)malloc(sizeof(uint64_t) * (nombresDePossiblesPremiers));
 		for (int i = 0, j = 2.0; j < N; possibles_premiers[i] = j,i++,j++);
-		unsigned int *res_operations = (unsigned int*)malloc(sizeof(unsigned int) * GRID(sqrtN));
-		for (int i = 0; i < GRID(sqrtN); res_operations[i] = 1,i++);
+		unsigned int *res_operations = (unsigned int*)malloc(sizeof(unsigned int) * TailleGrid(sqrtN));
+		for (int i = 0; i < TailleGrid(sqrtN); res_operations[i] = 1,i++);
 
 		uint64_t *dev_possibles_premiers;
 		cudaMalloc((void**)&dev_possibles_premiers, sizeof(uint64_t) * (nombresDePossiblesPremiers));
 
 		unsigned int *dev_res_operations;
-		cudaMalloc((void**)&dev_res_operations, sizeof(unsigned int) * GRID(sqrtN));
+		cudaMalloc((void**)&dev_res_operations, sizeof(unsigned int) * TailleGrid(sqrtN));
 
 
 		cudaMemcpy(dev_possibles_premiers, possibles_premiers, sizeof(uint64_t) * (nombresDePossiblesPremiers), cudaMemcpyHostToDevice);
-	       	cudaMemcpy(dev_res_operations, res_operations, sizeof(unsigned int) * GRID(sqrtN), cudaMemcpyHostToDevice);
-		isPrime<<<GRID(sqrtN),BLOCKDIM,SIZEMEM>>>(dev_possibles_premiers, dev_res_operations, N, sqrtN);
-		cudaMemcpy(res_operations, dev_res_operations, sizeof(unsigned int) * GRID(sqrtN), cudaMemcpyDeviceToHost);
+	       	cudaMemcpy(dev_res_operations, res_operations, sizeof(unsigned int) * TailleGrid(sqrtN), cudaMemcpyHostToDevice);
+		isPrime<<<TailleGrid(sqrtN),BLOCKDIM,SIZEMEM>>>(dev_possibles_premiers, dev_res_operations, N, sqrtN);
+		cudaMemcpy(res_operations, dev_res_operations, sizeof(unsigned int) * TailleGrid(sqrtN), cudaMemcpyDeviceToHost);
 
 
 			std::cout <<" N "<< N << " est premier ? " << res_operations[0] << '\n';
@@ -73,7 +76,7 @@ vector<uint64_t> searchPrimes(uint64_t N){
 		cudaMemcpy(dev_possibles_premiers, possibles_premiers, sizeof(uint64_t)*(N-2), cudaMemcpyHostToDevice);
 		cudaMemcpy(dev_square_roots, square_roots, sizeof(uint64_t)*(N-2), cudaMemcpyHostToDevice);
 		cudaMemcpy(dev_premiers, premiers, sizeof(uint64_t)*(N-2), cudaMemcpyHostToDevice);
-		searchPrimeGPU<<<GRID(N-2),BLOCKDIM,SIZEMEM>>>(
+		searchPrimeGPU<<<TailleGrid(N-2),BLOCKDIM,SIZEMEM>>>(
 				dev_possibles_premiers,
 				dev_square_roots,
 				N,
