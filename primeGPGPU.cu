@@ -25,9 +25,9 @@ void isPrimeGPU(
 	int tid = threadIdx.x;
 
 
-	extern __shared__ unsigned int Shared_memory[tid]=1;
+	extern __shared__ unsigned int Shared_memory;
 
-	//Shared_memory[tid] = 1;
+	Shared_memory[tid] = 1;
 	while (gid < sqrtN){
 
 		if(N%Prime_PossiblE[gid] !=0){
