@@ -147,7 +147,7 @@ void facteurs(uint64_t N){
 }
 
 int main( int argc, char **argv ){
-  uint64_t N =29;
+  uint64_t N =atol(argv[1]);
   auto start = high_resolution_clock::now();
 
   isPrime(N);
