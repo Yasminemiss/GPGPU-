@@ -3,8 +3,12 @@ g++ -o primeCPU primeCPU.cpp
 # pour lancer le code
 ./primeCPU
 
+
+
+
+
 # pour compiler la version GPGPU
-nvcc -arch=compute_35 -o main main.cu primeGPGPU.cu
+nvcc -arch=sm_35 -rdc=true -lcudadevrt -o main main.cu primeGPGPU.cu --expt-relaxed-constexpr
 
 # pour lancer
 ./main
