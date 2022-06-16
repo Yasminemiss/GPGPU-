@@ -76,13 +76,16 @@ vector<uint64_t> Lancer_searchPrimes(uint64_t N){
 		cudaMemcpy(dev_possibles_premiers, possibles_premiers, sizeof(uint64_t)*(N-2), cudaMemcpyHostToDevice);
 		cudaMemcpy(dev_square_roots, square_roots, sizeof(uint64_t)*(N-2), cudaMemcpyHostToDevice);
 		cudaMemcpy(dev_premiers, premiers, sizeof(uint64_t)*(N-2), cudaMemcpyHostToDevice);
-		searchPrimeGPU<<<TailleGrid(N-2),BLOCKDIM,SIZEMEM>>>(
+		uint64_t tailleGrid = (((N-2)+BLOCKDIM-1)/BLOCKDIM);
+		searchPrimeGPU<<<tailleGrid,BLOCKDIM,SIZEMEM>>>(
 				dev_possibles_premiers,
 				dev_square_roots,
 				N,
 				dev_premiers);
 
 		cudaMemcpy(premiers, dev_premiers, sizeof(uint64_t)*(N-2), cudaMemcpyDeviceToHost);
+
+
 
 		int nombresDePremiers = 0;
 		for(int i = 0; i < (N-2); i++){
@@ -99,11 +102,11 @@ vector<uint64_t> Lancer_searchPrimes(uint64_t N){
 			premiers[j] = 0;
 		}
 
-		string printable =  "Nombres premiers : \n " ;
+		string printable =  "La liste des  premiers : \n " ;
 
 	    for(int i =0 ; i < premiers_packed.size() ; i++)
 	    {
-	        printable += "[" + std::to_string(premiers_packed.at(i)) + "]";
+	        printable += "-" + std::to_string(premiers_packed.at(i)) + "-";
 	    }
 
 			std::cout <<printable << '\n';
@@ -155,6 +158,14 @@ void Lancer_facteurs(uint64_t N){
 	          resulat.push_back(c);
 	          }
 	   }
+
+		string res = "Les Facteurs premiers :  \n ";
+	 for(int i = 0 ; i < resulat.size(); i++)
+	 {
+			 string cell = to_string(resulat.at(i).base)+"^"+to_string(resulat.at(i).expo);
+			 res+= (i==resulat.size()-1) ? ""+cell : cell+"*" ;
+	 }
+	 std::std::cout << res << '\n';
 
 }
 
