@@ -27,7 +27,7 @@ void Lancer_isPrime(uint64_t N){
 		uint64_t *possibles_premiers = (uint64_t*)malloc(sizeof(uint64_t) * (nombresDePossiblesPremiers));
 		for (int i = 0, j = 2.0; j < N; possibles_premiers[i] = j,i++,j++);
 		unsigned int *res_operations = (unsigned int*)malloc(sizeof(unsigned int) * tailleGrid);
-		for (int i = 0; i < TailleGrid(sqrtN); res_operations[i] = 1,i++);
+		for (int i = 0; i < tailleGrid; res_operations[i] = 1,i++);
 
 		uint64_t *dev_possibles_premiers;
 		cudaMalloc((void**)&dev_possibles_premiers, sizeof(uint64_t) * (nombresDePossiblesPremiers));
@@ -36,13 +36,13 @@ void Lancer_isPrime(uint64_t N){
 
 
 
-		cudaMalloc((void**)&dev_res_operations, sizeof(unsigned int) * TailleGrid(sqrtN));
+		cudaMalloc((void**)&dev_res_operations, sizeof(unsigned int) *tailleGrid);
 
 
 		cudaMemcpy(dev_possibles_premiers, possibles_premiers, sizeof(uint64_t) * (nombresDePossiblesPremiers), cudaMemcpyHostToDevice);
-	       	cudaMemcpy(dev_res_operations, res_operations, sizeof(unsigned int) * TailleGrid(sqrtN), cudaMemcpyHostToDevice);
+	       	cudaMemcpy(dev_res_operations, res_operations, sizeof(unsigned int) * tailleGrid, cudaMemcpyHostToDevice);
 		isPrimeGPU<<<tailleGrid,BLOCKDIM,SIZEMEM>>>(dev_possibles_premiers, dev_res_operations, N, sqrtN);
-		cudaMemcpy(res_operations, dev_res_operations, sizeof(unsigned int) * TailleGrid(sqrtN), cudaMemcpyDeviceToHost);
+		cudaMemcpy(res_operations, dev_res_operations, sizeof(unsigned int) * tailleGrid, cudaMemcpyDeviceToHost);
 
 
 			std::cout <<" N "<< N << " est premier ? " << res_operations[0] << '\n';
@@ -133,7 +133,7 @@ void Lancer_facteurs(uint64_t N){
 	  factGPU<<<tailleGrid,BLOCKDIM>>>(
 				N,
 				dev_primes,
-				taille,
+				premiers_packed.size(),
 				dev_facteurs);
 
 	     	cudaMemcpy(facteurs,dev_facteurs,sizeof(fact)*premiers_packed.size(),cudaMemcpyDeviceToHost);
