@@ -158,6 +158,8 @@ int main( int argc, char **argv ){
   auto start = high_resolution_clock::now();
 
   Lancer_isPrime(N);
+	
+	
   vector<uint64_t> premiers_packed=Lancer_searchPrimes(N);
 	string printable =  "La liste des  premiers : \n " ;
 
@@ -167,7 +169,11 @@ int main( int argc, char **argv ){
 		}
 
 		std::cout <<printable << '\n';
+	
+	
   Lancer_facteurs(N);
+	
+	
   auto stop = high_resolution_clock::now();
   auto duration = duration_cast<microseconds>(stop - start);
  cout << "Time taken by GPU version : "
