@@ -100,6 +100,8 @@ int main( int argc, char **argv )
   cout << " fonction isPrime  N "<<N<<" est prime ? " <<isPrimeCPU(N) <<'\n';
   auto start = high_resolution_clock::now();
 
+    
+    
   vector<uint64_t> v = searchPrimesCPU(N);
   cout << " fonction search prime " << '\n';
   i =0;
@@ -107,14 +109,19 @@ int main( int argc, char **argv )
       cout << " nombre premier "<< std::to_string(v.at(i))<<'\n';
     i++;
    }
-
   cout << " fonction facteursPrimes " << '\n';
-  vector<uint64_t*> facteurs(0);
+    
+    
+  vector<uint64_t*> facteurs(0); 
   factoCPU(N,&facteurs);
   auto stop = high_resolution_clock::now();
    auto duration = duration_cast<microseconds>(stop - start);
 
    cout << "Time taken by function: "
         << duration.count() << " microseconds" << endl;
+    
+    
+    
+    
  	return 0;
 }
