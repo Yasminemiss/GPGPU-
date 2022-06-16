@@ -117,6 +117,7 @@ void Lancer_facteurs(uint64_t N){
 		for(int i =0 ; i<taille; i++) {
 				facteurs[i].base=primes[i];
 				facteurs[i].expo=0;
+				std::cout << "/* les primes  */"<<facteurs[i].base <<"expo "<< facteurs[i].expo<< '\n';
 		}
 
 		uint64_t *dev_primes;
@@ -128,8 +129,8 @@ void Lancer_facteurs(uint64_t N){
 		cudaMemcpy(dev_primes,primes,sizeof(uint64_t)*taille,cudaMemcpyHostToDevice);
 		cudaMemcpy(dev_facteurs,facteurs,sizeof(fact)*taille,cudaMemcpyHostToDevice);
 
-
-	  factGPU<<<TailleGrid(taille),BLOCKDIM>>>(
+			uint64_t tailleGrid = (((taille)+BLOCKDIM-1)/BLOCKDIM);
+	  factGPU<<<tailleGrid,BLOCKDIM>>>(
 				N,
 				dev_primes,
 				taille,
