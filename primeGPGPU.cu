@@ -76,13 +76,14 @@ void factGPU(
 		__syncthreads();
 
 		if (tid == 0){
-			int i = 0;
-			while ( i < blockDim.x){
-				if (Shared_memory[i]==1) {
+		//	int i = 0;
+		//	while ( i < blockDim.x){
+		for (int i = 0; i < blockDim.x; i++){
+				if (Shared_memory[i]) {
 					res_facteurs[i+blockIdx.x*blockDim.x].expo =	res_facteurs[i+blockIdx.x*blockDim.x].expo + Shared_memory[i];
 					N = N- (res_facteurs[i+blockIdx.x*blockDim.x].base * Shared_memory[i]);
 				}
-				i++;
+				//i++;
 			}
 		}
 		__syncthreads();
