@@ -154,6 +154,7 @@ void Lancer_facteurs(uint64_t N){
 	         {
 	            fact c;
 	           c.base=facteurs[i].base;
+						 std::cout << c.base <<" voir " << '\n';
 	          c.expo=facteurs[i].expo;
 	          resulat.push_back(c);
 	          }
@@ -165,7 +166,7 @@ void Lancer_facteurs(uint64_t N){
 			 string cell = to_string(resulat.at(i).base)+"^"+to_string(resulat.at(i).expo);
 			 res+= (i==resulat.size()-1) ? ""+cell : cell+"*" ;
 	 }
-	 std::std::cout << res << '\n';
+	 std::cout << res << '\n';
 
 }
 
