@@ -22,10 +22,11 @@ using namespace std::chrono;
 void Lancer_isPrime(uint64_t N){
 		uint64_t sqrtN = sqrt(N) + 1;
 		uint64_t nombresDePossiblesPremiers = N-2;
+					uint64_t tailleGrid = (((sqrtN)+BLOCKDIM-1)/BLOCKDIM);
 
 		uint64_t *possibles_premiers = (uint64_t*)malloc(sizeof(uint64_t) * (nombresDePossiblesPremiers));
 		for (int i = 0, j = 2.0; j < N; possibles_premiers[i] = j,i++,j++);
-		unsigned int *res_operations = (unsigned int*)malloc(sizeof(unsigned int) * TailleGrid(sqrtN));
+		unsigned int *res_operations = (unsigned int*)malloc(sizeof(unsigned int) * tailleGrid);
 		for (int i = 0; i < TailleGrid(sqrtN); res_operations[i] = 1,i++);
 
 		uint64_t *dev_possibles_premiers;
@@ -33,7 +34,7 @@ void Lancer_isPrime(uint64_t N){
 
 		unsigned int *dev_res_operations;
 
-			uint64_t tailleGrid = (((sqrtN)+BLOCKDIM-1)/BLOCKDIM);
+
 
 		cudaMalloc((void**)&dev_res_operations, sizeof(unsigned int) * TailleGrid(sqrtN));
 
@@ -125,8 +126,8 @@ void Lancer_facteurs(uint64_t N){
 		cudaMalloc((void**)&dev_primes,sizeof(uint64_t)*premiers_packed.size());
 	  cudaMalloc((void**)&dev_facteurs,sizeof(fact)*premiers_packed.size());
 
-		cudaMemcpy(dev_primes,primes,sizeof(uint64_t)*taille,cudaMemcpyHostToDevice);
-		cudaMemcpy(dev_facteurs,facteurs,sizeof(fact)*taille,cudaMemcpyHostToDevice);
+		cudaMemcpy(dev_primes,primes,sizeof(uint64_t)*premiers_packed.size(),cudaMemcpyHostToDevice);
+		cudaMemcpy(dev_facteurs,facteurs,sizeof(fact)*premiers_packed.size(),cudaMemcpyHostToDevice);
 
 			uint64_t tailleGrid = (((premiers_packed.size())+BLOCKDIM-1)/BLOCKDIM);
 	  factGPU<<<tailleGrid,BLOCKDIM>>>(
