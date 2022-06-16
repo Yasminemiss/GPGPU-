@@ -54,44 +54,39 @@ void isPrimeGPU(
 
 __global__ void searchPrimeGPU(
 		uint64_t *Prime_PossiblE,
-		uint64_t *square_roots,
-		uint64_t borne_sup,
-		uint64_t *premiers)
+		uint64_t *carre,
+		uint64_t limit,
+		uint64_t *prime)
 {
-	int gid = threadIdx.x + blockIdx.x * blockDim.x;
-	while (gid < borne_sup-2) {
-		if (gid == 0) {
-			premiers[gid] = 1;
-		} else {
-			int resultat_size = ((square_roots[gid]+blockDim.x-1)/blockDim.x)+1;
+	int t_id = threadIdx.x + blockIdx.x * blockDim.x;
+
+	while (t_id < limit-2) {
+		if (t_id == 0) {prime[t_id] = 1; }
+
+		 else{
+
+
+			int resultat_size = ((carre[t_id]+blockDim.x-1)/blockDim.x)+1;
 			unsigned int *resultat = (unsigned int*)malloc(sizeof(unsigned int)*resultat_size);
 
-
-			/*isPrimeGPU<<<gridDim.x,blockDim.x,blockDim.x*sizeof(unsigned int)>>>
-				(Prime_PossiblE,
-			 	resultat,
-			 	Prime_PossiblE[gid],
-			 	square_roots[gid]
-			);*/
-			int i = Prime_PossiblE[gid]-1;
+			int i = Prime_PossiblE[t_id]-1;
 			int stopBoucle=0;
 	    while(i >= 2 && stopBoucle==0)
 	    {
-	        if (floor(Prime_PossiblE[gid]/i) == Prime_PossiblE[gid]/i){
-						//return false;
+	        if (floor(Prime_PossiblE[t_id]/i) == Prime_PossiblE[t_id]/i){
 						resultat[0]=0;
 						stopBoucle=1;
 					}
 	        i--;
 	    }
-
 			if(stopBoucle==1) 		resultat[0]=1;
-	    //return true;
 			cudaDeviceSynchronize();
-			premiers[gid] = resultat[0];
+
+
+			prime[t_id] = resultat[0];
 			free(resultat);
 		}
-		gid += gridDim.x * blockDim.x;
+		t_id += gridDim.x * blockDim.x;
 	}
 
 }
@@ -100,38 +95,41 @@ __global__ void searchPrimeGPU(
 __global__
 void factGPU(
 		uint64_t  N,
-		uint64_t *dev_primes,
-               	int taille,
-		fact *dev_facteurs
+		uint64_t *res_primes,
+               	int size,
+		fact *res_facteurs
 )
 {
-	int gid = threadIdx.x+blockIdx.x*blockDim.x;
+	int index_grid = threadIdx.x+blockIdx.x*blockDim.x;
 	int tid = threadIdx.x;
-        extern __shared__ unsigned int Shared_memory[];
+  extern __shared__ unsigned int Shared_memory[];
 
-	while(gid < taille)
-       	{
-        	Shared_memory[tid] = 0;
-		uint64_t temp_N = N;
+	while(index_grid < size){
 
-		while(temp_N%dev_primes[gid]==0)
-                {
+
+    Shared_memory[tid] = 0;
+		uint64_t tmp = N;
+
+		while(tmp%res_primes[index_grid]==0){
 			Shared_memory[tid] += 1;
-			temp_N /= dev_primes[gid];
+			tmp = tmp/res_primes[index_grid];
 		}
 
 		__syncthreads();
 
 		if (tid == 0){
-			for (int i = 0; i < blockDim.x; i++){
-				if (Shared_memory[i]) {
-					dev_facteurs[i+blockIdx.x*blockDim.x].expo += Shared_memory[i];
-					N -= (dev_facteurs[i+blockIdx.x*blockDim.x].base * Shared_memory[i]);
+			int i = 0;
+			while ( i < blockDim.x){
+				if (Shared_memory[i]==1) {
+					res_facteurs[i+blockIdx.x*blockDim.x].expo =	res_facteurs[i+blockIdx.x*blockDim.x].expo + Shared_memory[i];
+					N = N- (res_facteurs[i+blockIdx.x*blockDim.x].base * Shared_memory[i]);
 				}
+				i++;
 			}
 		}
 		__syncthreads();
 
-            gid+=blockDim.x*gridDim.x;
-        }
+    index_grid+=blockDim.x*gridDim.x;
+
+    }
 }

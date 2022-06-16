@@ -8,6 +8,9 @@
 #include <cstdint>
 #include "common.hpp"
 #include <bits/stdc++.h>
+#include <string>
+#include <ctgmath>
+#include <chrono>
 
 using namespace std;
 
@@ -17,24 +20,26 @@ struct fact {
 };
 
 __global__
-void isPrimeGPU(	uint64_t *possibles_premiers,
-		unsigned int *res_operations,
-		uint64_t  N,
-		uint64_t sqrtN);
+void isPrimeGPU(
+		uint64_t *Prime_PossiblE,
+		unsigned int *resultat,
+		uint64_t N,
+		uint64_t sqrtN
+  );
 
 
 
-__global__ void factGPU(
-		uint64_t  N,
-		uint64_t *dev_primes,
-                int taille,
-		fact *dev_facteurs
-		);
+  __global__
+  void factGPU(
+  		uint64_t  N,
+  		uint64_t *res_primes,
+                 	int size,
+  		fact *res_facteurs
+  );
 
-__global__
-void searchPrimeGPU(
-		uint64_t *possibles_premiers,
-		uint64_t *square_roots,
-		uint64_t borne_sup,
-		uint64_t *premiers);
+    __global__ void searchPrimeGPU(
+    		uint64_t *Prime_PossiblE,
+    		uint64_t *carre,
+    		uint64_t limit,
+    		uint64_t *prime);
 #endif
