@@ -56,7 +56,7 @@ void factGPU(
 		uint64_t  N,
 		uint64_t *dev_primes,
                	int taille,
-		cell *dev_facteurs
+		fact *dev_facteurs
 )
 {
 	int gid = threadIdx.x+blockIdx.x*blockDim.x;
