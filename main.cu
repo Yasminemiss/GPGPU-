@@ -99,6 +99,15 @@ vector<uint64_t> Lancer_searchPrimes(uint64_t N){
 			premiers[j] = 0;
 		}
 
+		string printable =  "Nombres premiers : \n " ;
+
+	    for(int i =0 ; i < premiers_packed.size() ; i++)
+	    {
+	        printable += "[" + std::to_string(premiers_packed.at(i)) + "]";
+	    }
+
+			std::cout <<printable << '\n';
+
 		return premiers_packed;
 }
 
