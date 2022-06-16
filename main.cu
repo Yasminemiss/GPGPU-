@@ -18,10 +18,6 @@ using namespace std::chrono;
 #define BLOCKDIM 256
 #define SIZEMEM (BLOCKDIM * sizeof(unsigned int))
 
-uint64_t TailleGrid(uint64_t X){
-	return ((X+BLOCKDIM-1)/BLOCKDIM);
-}
-
 
 void Lancer_isPrime(uint64_t N){
 		uint64_t sqrtN = sqrt(N) + 1;
@@ -36,12 +32,15 @@ void Lancer_isPrime(uint64_t N){
 		cudaMalloc((void**)&dev_possibles_premiers, sizeof(uint64_t) * (nombresDePossiblesPremiers));
 
 		unsigned int *dev_res_operations;
+
+			uint64_t tailleGrid = (((sqrtN)+BLOCKDIM-1)/BLOCKDIM);
+
 		cudaMalloc((void**)&dev_res_operations, sizeof(unsigned int) * TailleGrid(sqrtN));
 
 
 		cudaMemcpy(dev_possibles_premiers, possibles_premiers, sizeof(uint64_t) * (nombresDePossiblesPremiers), cudaMemcpyHostToDevice);
 	       	cudaMemcpy(dev_res_operations, res_operations, sizeof(unsigned int) * TailleGrid(sqrtN), cudaMemcpyHostToDevice);
-		isPrimeGPU<<<TailleGrid(sqrtN),BLOCKDIM,SIZEMEM>>>(dev_possibles_premiers, dev_res_operations, N, sqrtN);
+		isPrimeGPU<<<tailleGrid,BLOCKDIM,SIZEMEM>>>(dev_possibles_premiers, dev_res_operations, N, sqrtN);
 		cudaMemcpy(res_operations, dev_res_operations, sizeof(unsigned int) * TailleGrid(sqrtN), cudaMemcpyDeviceToHost);
 
 
@@ -109,12 +108,12 @@ vector<uint64_t> Lancer_searchPrimes(uint64_t N){
 void Lancer_facteurs(uint64_t N){
 
   	vector<uint64_t> premiers_packed = Lancer_searchPrimes(N);
-		int taille = premiers_packed.size();
-		uint64_t *primes = (uint64_t*)malloc(sizeof(uint64_t) * taille);
-		for(int i = 0; i < taille; primes[i]=premiers_packed.at(i),i++);
 
-		fact  *facteurs=(fact*)malloc(sizeof(fact)*taille);
-		for(int i =0 ; i<taille; i++) {
+		uint64_t *primes = (uint64_t*)malloc(sizeof(uint64_t) * premiers_packed.size());
+		for(int i = 0; i < premiers_packed.size(); primes[i]=premiers_packed.at(i),i++);
+
+		fact  *facteurs=(fact*)malloc(sizeof(fact)*premiers_packed.size());
+		for(int i =0 ; i<premiers_packed.size(); i++) {
 				facteurs[i].base=primes[i];
 				facteurs[i].expo=0;
 				std::cout << "/* les primes  */"<<facteurs[i].base <<"expo "<< facteurs[i].expo<< '\n';
@@ -123,43 +122,33 @@ void Lancer_facteurs(uint64_t N){
 		uint64_t *dev_primes;
 		fact *dev_facteurs;
 
-		cudaMalloc((void**)&dev_primes,sizeof(uint64_t)*taille);
-	  cudaMalloc((void**)&dev_facteurs,sizeof(fact)*taille);
+		cudaMalloc((void**)&dev_primes,sizeof(uint64_t)*premiers_packed.size());
+	  cudaMalloc((void**)&dev_facteurs,sizeof(fact)*premiers_packed.size());
 
 		cudaMemcpy(dev_primes,primes,sizeof(uint64_t)*taille,cudaMemcpyHostToDevice);
 		cudaMemcpy(dev_facteurs,facteurs,sizeof(fact)*taille,cudaMemcpyHostToDevice);
 
-			uint64_t tailleGrid = (((taille)+BLOCKDIM-1)/BLOCKDIM);
+			uint64_t tailleGrid = (((premiers_packed.size())+BLOCKDIM-1)/BLOCKDIM);
 	  factGPU<<<tailleGrid,BLOCKDIM>>>(
 				N,
 				dev_primes,
 				taille,
 				dev_facteurs);
 
-	     	cudaMemcpy(facteurs,dev_facteurs,sizeof(fact)*taille,cudaMemcpyDeviceToHost);
+	     	cudaMemcpy(facteurs,dev_facteurs,sizeof(fact)*premiers_packed.size(),cudaMemcpyDeviceToHost);
 
 
 	     vector<fact> resulat(0);
-	    for(int i=0 ; i <taille;i++)
+	    for(int i=0 ; i <premiers_packed.size();i++)
 	    {
-
 	          if(facteurs[i].expo!=0)
 	         {
 	            fact c;
 	           c.base=facteurs[i].base;
-						 std::cout << c.base <<" voir " << '\n';
 	          c.expo=facteurs[i].expo;
 	          resulat.push_back(c);
 	          }
 	   }
-
-		string res = "Les Facteurs premiers :  \n ";
-	 for(int i = 0 ; i < resulat.size(); i++)
-	 {
-			 string cell = to_string(resulat.at(i).base)+"^"+to_string(resulat.at(i).expo);
-			 res+= (i==resulat.size()-1) ? ""+cell : cell+"*" ;
-	 }
-	 std::cout << res << '\n';
 
 }
 

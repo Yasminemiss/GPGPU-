@@ -51,44 +51,49 @@ void isPrimeGPU(
 		resultat[0] = ((resultat[0] != 0) && (resultat[initial_gid] != 0));
 }
 
+
 __global__
 void factGPU(
 		uint64_t  N,
-		uint64_t *dev_primes,
-               	int taille,
-		fact *dev_facteurs
+		uint64_t *res_primes,
+               	int size,
+		fact *res_facteurs
 )
 {
-	int gid = threadIdx.x+blockIdx.x*blockDim.x;
+	int index_grid = threadIdx.x+blockIdx.x*blockDim.x;
 	int tid = threadIdx.x;
-        extern __shared__ unsigned int cache[];
+  extern __shared__ unsigned int Shared_memory[];
 
-	while(gid < taille)
-       	{
-        	cache[tid] = 0;
-		uint64_t temp_N = N;
+	while(index_grid < size){
 
-		while(temp_N%dev_primes[gid]==0)
-                {
-			cache[tid] += 1;
-			temp_N /= dev_primes[gid];
+
+    Shared_memory[tid] = 0;
+		uint64_t tmp = N;
+		while(tmp%res_primes[index_grid]==0){
+			Shared_memory[tid] += 1;
+			tmp = tmp/res_primes[index_grid];
 		}
-
 		__syncthreads();
 
 		if (tid == 0){
-			for (int i = 0; i < blockDim.x; i++){
-				if (cache[i]) {
-					dev_facteurs[i+blockIdx.x*blockDim.x].expo += cache[i];
-					N -= (dev_facteurs[i+blockIdx.x*blockDim.x].base * cache[i]);
+			int i = 0;
+			while ( i < blockDim.x){
+
+				if (Shared_memory[i]) {
+					res_facteurs[i+blockIdx.x*blockDim.x].expo =	res_facteurs[i+blockIdx.x*blockDim.x].expo + Shared_memory[i];
+					N = N- (res_facteurs[i+blockIdx.x*blockDim.x].base * Shared_memory[i]);
+
 				}
+				i++;
 			}
 		}
 		__syncthreads();
 
-            gid+=blockDim.x*gridDim.x;
-        }
+    index_grid+=blockDim.x*gridDim.x;
+
+    }
 }
+
 
 
 __global__ void searchPrimeGPU(

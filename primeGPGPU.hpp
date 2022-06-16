@@ -27,12 +27,13 @@ void isPrimeGPU(
 		uint64_t sqrtN
   );
 
-  __global__ void factGPU(
-		uint64_t  N,
-		uint64_t *dev_primes,
-                int taille,
-		fact *dev_facteurs
-		);
+  __global__
+  void factGPU(
+  		uint64_t  N,
+  		uint64_t *res_primes,
+                 	int size,
+  		fact *res_facteurs
+  );
 
   __global__ void searchPrimeGPU(
   		uint64_t *Prime_PossiblE,
