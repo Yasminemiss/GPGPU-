@@ -37,9 +37,9 @@ void isPrimeGPU(
   		fact *res_facteurs
   );
 
-  void searchPrimeGPU(
-  		uint64_t *possibles_premiers,
-  		uint64_t *square_roots,
-  		uint64_t borne_sup,
-  		uint64_t *premiers);
+  __global__ void searchPrimeGPU(
+  		uint64_t *Prime_PossiblE,
+  		uint64_t *carre,
+  		uint64_t limit,
+  		uint64_t *res_premes);
 #endif

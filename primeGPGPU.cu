@@ -52,36 +52,6 @@ void isPrimeGPU(
 }
 
 
-__global__ void searchPrimeGPU(
-		uint64_t *possibles_premiers,
-		uint64_t *square_roots,
-		uint64_t borne_sup,
-		uint64_t *premiers)
-{
-	int gid = threadIdx.x + blockIdx.x * blockDim.x;
-	while (gid < borne_sup-2) {
-		if (gid == 0) {
-			premiers[gid] = 1;
-		} else {
-			int res_operations_size = ((square_roots[gid]+blockDim.x-1)/blockDim.x)+1;
-			unsigned int *res_operations = (unsigned int*)malloc(sizeof(unsigned int)*res_operations_size);
-			isPrime<<<gridDim.x,blockDim.x,blockDim.x*sizeof(unsigned int)>>>
-				(possibles_premiers,
-			 	res_operations,
-			 	possibles_premiers[gid],
-			 	square_roots[gid]
-			 	);
-			cudaDeviceSynchronize();
-
-			premiers[gid] = res_operations[0];
-			free(res_operations);
-		}
-		gid += gridDim.x * blockDim.x;
-	}
-
-}
-
-
 __global__
 void factGPU(
 		uint64_t  N,
@@ -120,4 +90,37 @@ void factGPU(
     index_grid+=blockDim.x*gridDim.x;
 
     }
+}
+
+
+
+__global__ void searchPrimeGPU(
+		uint64_t *Prime_PossiblE,
+		uint64_t *carre,
+		uint64_t limit,
+		uint64_t *res_premes)
+{
+	int t_id = threadIdx.x + blockIdx.x * blockDim.x;
+	while (t_id < limit-2) {
+		if (t_id == 0) {
+			res_premes[t_id] = 1;
+		} else {
+			int res_operations_size = ((carre[t_id]+blockDim.x-1)/blockDim.x)+1;
+			unsigned int *res_operations = (unsigned int*)malloc(sizeof(unsigned int)*res_operations_size);
+
+
+			isPrimeGPU<<<gridDim.x,blockDim.x,blockDim.x*sizeof(unsigned int)>>>
+				(Prime_PossiblE,
+			 	res_operations,
+			 	Prime_PossiblE[t_id],
+			 	carre[t_id]
+			 	);
+			cudaDeviceSynchronize();
+
+			res_premes[t_id] = res_operations[0];
+			free(res_operations);
+		}
+		t_id += gridDim.x * blockDim.x;
+	}
+
 }
