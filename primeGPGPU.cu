@@ -18,15 +18,11 @@ void isPrimeGPU(
 		uint64_t N,
 		uint64_t sqrtN
 		){
-
 	int gid = threadIdx.x + blockIdx.x * blockDim.x;
 	int initial_gid = gid;
 	int bid = blockIdx.x;
 	int tid = threadIdx.x;
-
-
 	extern __shared__ unsigned int Shared_memory[];
-
 	Shared_memory[tid] = 1;
 	while (gid < sqrtN){
 
@@ -35,11 +31,7 @@ void isPrimeGPU(
 		}else{
 				Shared_memory[tid] = 0;
 		}
-
 		__syncthreads();
-
-
-
 		int i = blockDim.x/2;
 		while (i >32) {
 
@@ -49,21 +41,14 @@ void isPrimeGPU(
 			__syncthreads();
 			i /= 2;
 		}
-
     if(tid < 32) warpReduce(Shared_memory,tid);
-
 		if (tid == 0) {
 			resultat[bid] = Shared_memory[0];
 		}
-
 		gid += gridDim.x * blockDim.x;
-
 	}
-
-
 	if (initial_gid < ((sqrtN+blockDim.x-1)/blockDim.x))
 		resultat[0] = ((resultat[0] != 0) && (resultat[initial_gid] != 0));
-
 }
 
 
@@ -73,7 +58,7 @@ __global__ void searchPrimeGPU(
 		uint64_t borne_sup,
 		uint64_t *premiers)
 {
-	/*int gid = threadIdx.x + blockIdx.x * blockDim.x;
+	int gid = threadIdx.x + blockIdx.x * blockDim.x;
 	while (gid < borne_sup-2) {
 		if (gid == 0) {
 			premiers[gid] = 1;
@@ -81,19 +66,33 @@ __global__ void searchPrimeGPU(
 			int resultat_size = ((square_roots[gid]+blockDim.x-1)/blockDim.x)+1;
 			unsigned int *resultat = (unsigned int*)malloc(sizeof(unsigned int)*resultat_size);
 
-			isPrimeGPU<<<gridDim.x,blockDim.x,blockDim.x*sizeof(unsigned int)>>>
+
+			/*isPrimeGPU<<<gridDim.x,blockDim.x,blockDim.x*sizeof(unsigned int)>>>
 				(Prime_PossiblE,
 			 	resultat,
 			 	Prime_PossiblE[gid],
 			 	square_roots[gid]
-			 	);
-			cudaDeviceSynchronize();
+			);*/
+			int i = Prime_PossiblE[gid]-1;
+			int stopBoucle=0;
+	    while(i >= 2 && stopBoucle==0)
+	    {
+	        if (floor(Prime_PossiblE[gid]/i) == Prime_PossiblE[gid]/i){
+						//return false;
+						resultat[0]=0;
+						stopBoucle=1;
+					}
+	        i--;
+	    }
 
+			if(stopBoucle==1) 		resultat[0]=1;
+	    //return true;
+			cudaDeviceSynchronize();
 			premiers[gid] = resultat[0];
 			free(resultat);
 		}
 		gid += gridDim.x * blockDim.x;
-	}*/
+	}
 
 }
 
