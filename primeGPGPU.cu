@@ -80,8 +80,12 @@ void factGPU(
 		//	while ( i < blockDim.x){
 		for (int i = 0; i < blockDim.x; i++){
 				if (Shared_memory[i]) {
-					res_facteurs[i+blockIdx.x*blockDim.x].expo =	res_facteurs[i+blockIdx.x*blockDim.x].expo + Shared_memory[i];
-					N = N- (res_facteurs[i+blockIdx.x*blockDim.x].base * Shared_memory[i]);
+					//res_facteurs[i+blockIdx.x*blockDim.x].expo =	res_facteurs[i+blockIdx.x*blockDim.x].expo + Shared_memory[i];
+					//N = N- (res_facteurs[i+blockIdx.x*blockDim.x].base * Shared_memory[i]);
+
+
+					res_facteurs[i+blockIdx.x*blockDim.x].expo += Shared_memory[i];
+					N -=  (res_facteurs[i+blockIdx.x*blockDim.x].base * Shared_memory[i]);
 				}
 				//i++;
 			}

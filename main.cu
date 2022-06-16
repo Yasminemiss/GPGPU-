@@ -102,14 +102,6 @@ vector<uint64_t> Lancer_searchPrimes(uint64_t N){
 			premiers[j] = 0;
 		}
 
-		string printable =  "La liste des  premiers : \n " ;
-
-	    for(int i =0 ; i < premiers_packed.size() ; i++)
-	    {
-	        printable += "-" + std::to_string(premiers_packed.at(i)) + "-";
-	    }
-
-			std::cout <<printable << '\n';
 
 		return premiers_packed;
 }
@@ -175,7 +167,15 @@ int main( int argc, char **argv ){
   auto start = high_resolution_clock::now();
 
   Lancer_isPrime(N);
-  vector<uint64_t> v=Lancer_searchPrimes(N);
+  vector<uint64_t> premiers_packed=Lancer_searchPrimes(N);
+	string printable =  "La liste des  premiers : \n " ;
+
+		for(int i =0 ; i < premiers_packed.size() ; i++)
+		{
+				printable += "-" + std::to_string(premiers_packed.at(i)) + "-";
+		}
+
+		std::cout <<printable << '\n';
   Lancer_facteurs(N);
   auto stop = high_resolution_clock::now();
   auto duration = duration_cast<microseconds>(stop - start);
